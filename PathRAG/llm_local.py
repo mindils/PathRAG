@@ -34,6 +34,9 @@ async def qwen_local_complete(
     messages.extend(history_messages)
     messages.append({"role": "user", "content": prompt})
 
+    logger.info(f"!!!LLM message!!!: {messages}")
+
+
     # Подготавливаем данные для запроса
     data = {
         "model": "Qwen/Qwen3-30B-A3B-Instruct-2507",
@@ -82,16 +85,16 @@ async def qwen_local_complete(
                         if json_match:
                             json_str = json_match.group(0)
                             data = json.loads(json_str)
-                            return GPTKeywordExtractionFormat(
-                                high_level_keywords=data.get("high_level_keywords", []),
-                                low_level_keywords=data.get("low_level_keywords", [])
-                            )
+                            return json.dumps({
+                                "high_level_keywords": data.get("high_level_keywords", []),
+                                "low_level_keywords": data.get("low_level_keywords", [])
+                            }, ensure_ascii=False)
                     except:
                         logger.warning("Failed to parse keyword extraction response")
-                        return GPTKeywordExtractionFormat(
-                            high_level_keywords=[],
-                            low_level_keywords=[]
-                        )
+                        return json.dumps({
+                            "high_level_keywords": [],
+                            "low_level_keywords": []
+                        }, ensure_ascii=False)
 
                 return content
 

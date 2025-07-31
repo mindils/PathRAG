@@ -1,1 +1,7 @@
 .idea
+*.log
+PathRAG/__pycache__/
+input/
+pathrag_index/
+qdrant_storage/
+
