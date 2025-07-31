@@ -1,0 +1,54 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pathrag"
+version = "0.1.0"
+description = "PathRAG: Graph-based Retrieval Augmented Generation with Relational Paths"
+readme = "README.md"
+requires-python = ">=3.8"
+license = {text = "MIT"}
+authors = [
+    {name = "PathRAG Authors"},
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+]
+
+dependencies = [
+    "accelerate",
+    "aiohttp",
+    "graspologic",
+    "hnswlib",
+    "nano-vectordb",
+    "networkx",
+    "openai",
+    "sqlalchemy",
+    "tenacity",
+    "tiktoken",
+    "torch",
+    "transformers",
+    "xxhash",
+    "numpy",
+    "tqdm",
+]
+
+[project.optional-dependencies]
+qdrant = ["qdrant-client>=1.7.0"]
+pdf = ["PyPDF2>=3.0.0"]
+dev = [
+    "pytest>=6.0",
+    "pytest-asyncio",
+    "black",
+    "flake8",
+]
+
+[tool.setuptools.packages.find]
+include = ["PathRAG*"]
