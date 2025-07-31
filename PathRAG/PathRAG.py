@@ -66,6 +66,7 @@ def lazy_external_import(module_name: str, class_name: str):
 
 
 Neo4JStorage = lazy_external_import(".kg.neo4j_impl", "Neo4JStorage")
+QdrantVectorDBStorage = lazy_external_import(".storage_qdrant", "QdrantVectorDBStorage")
 OracleKVStorage = lazy_external_import(".kg.oracle_impl", "OracleKVStorage")
 OracleGraphStorage = lazy_external_import(".kg.oracle_impl", "OracleGraphStorage")
 OracleVectorDBStorage = lazy_external_import(".kg.oracle_impl", "OracleVectorDBStorage")
@@ -267,6 +268,8 @@ class PathRAG:
             "Neo4JStorage": Neo4JStorage,
             "OracleGraphStorage": OracleGraphStorage,
             "AGEStorage": AGEStorage,
+
+            "QdrantVectorDBStorage": QdrantVectorDBStorage,
 
         }
 
