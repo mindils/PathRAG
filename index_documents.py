@@ -17,43 +17,44 @@ async def index_documents():
         llm_model_func=qwen_local_complete,
         embedding_func=qwen_local_embedding,
 
-        # Используем Qdrant для векторного хранилища
-        # vector_storage="QdrantVectorDBStorage",
-
-        # Настройки Qdrant
-        # qdrant_config={
-        #     "host": "localhost",
-        #     "port": 6333,
-        #     "grpc_port": 6334,
-        # },
-
-        # Параметры чанков
-        chunk_token_size=1200,
-        chunk_overlap_token_size=100,
+        # Параметры чанков - увеличиваем для нормативных документов
+        chunk_token_size=2000,  # Увеличено для захвата полных разделов
+        chunk_overlap_token_size=200,  # Больше перекрытие для связности
 
         # Параметры извлечения сущностей
-        entity_extract_max_gleaning=1,  # Количество итераций извлечения
-        entity_summary_to_max_tokens=500,
-
-        # Параметры моделей
-        llm_model_max_token_size=32768,
-        llm_model_max_async=4,  # Количество параллельных запросов к LLM
-        embedding_batch_num=32,
-        embedding_func_max_async=8,
-
-        # Включаем кэширование
-        enable_llm_cache=True,
+        entity_extract_max_gleaning=2,  # Больше итераций для полноты
+        entity_summary_to_max_tokens=1000,  # Больше токенов для описаний
 
         # Дополнительные параметры
         addon_params={
-            "language": "English",  # Или "Russian" если документы на русском
-            "entity_types": ["organization", "person", "technology", "location", "concept"],
+            "language": "Russian",
+            "entity_types": [
+                "organization",  # АА "Компания", филиалы, департаменты
+                "person",  # работники, руководители
+                "document",  # приказы, положения, заявления
+                "regulation",  # нормативные акты, положения
+                "department",  # структурные подразделения
+                "position",  # должности
+                "process",  # процессы и процедуры
+                "term",  # термины и определения
+                "date",  # даты и сроки
+                "amount",  # суммы, размеры, проценты
+                "period",  # периоды времени
+                "condition"  # условия и требования
+            ],
+            "example_number": 2,  # Использовать примеры
+
+            # Дополнительные параметры для русского языка
+            "extract_patterns": {
+                "document_refs": r"(?:приказ|положение|регламент|инструкция).*?№\s*\d+.*?от\s*\d{1,2}\.\d{1,2}\.\d{4}",
+                "amounts": r"\d+(?:\s*\d{3})*(?:\.\d{2})?\s*(?:руб(?:лей|ля|ль)?|%|процент)",
+                "dates": r"\d{1,2}\.\d{1,2}\.\d{4}",
+                "periods": r"\d+\s*(?:лет|года?|месяц|месяца|месяцев|дня|дней|календарных дней)"
+            }
         },
 
-        # Уровень логирования
         log_level="INFO",
     )
-
     # Получаем список файлов для индексации
     input_files = []
 

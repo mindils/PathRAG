@@ -2,285 +2,237 @@ GRAPH_FIELD_SEP = "<SEP>"
 
 PROMPTS = {}
 
-PROMPTS["DEFAULT_LANGUAGE"] = "English"
+PROMPTS["DEFAULT_LANGUAGE"] = "Russian"
 PROMPTS["DEFAULT_TUPLE_DELIMITER"] = "<|>"
 PROMPTS["DEFAULT_RECORD_DELIMITER"] = "##"
 PROMPTS["DEFAULT_COMPLETION_DELIMITER"] = "<|COMPLETE|>"
 PROMPTS["process_tickers"] = ["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"]
 
-PROMPTS["DEFAULT_ENTITY_TYPES"] = ["organization", "person", "geo", "event", "category"]
-
-PROMPTS["entity_extraction"] = """-Goal-
-Given a text document that is potentially relevant to this activity and a list of entity types, identify all entities of those types from the text and all relationships among the identified entities.
-Use {language} as output language.
-
--Steps-
-1. Identify all entities. For each identified entity, extract the following information:
-- entity_name: Name of the entity, use same language as input text. If English, capitalized the name.
-- entity_type: One of the following types: [{entity_types}]
-- entity_description: Comprehensive description of the entity's attributes and activities
-Format each entity as ("entity"{tuple_delimiter}<entity_name>{tuple_delimiter}<entity_type>{tuple_delimiter}<entity_description>)
-
-2. From the entities identified in step 1, identify all pairs of (source_entity, target_entity) that are *clearly related* to each other.
-For each pair of related entities, extract the following information:
-- source_entity: name of the source entity, as identified in step 1
-- target_entity: name of the target entity, as identified in step 1
-- relationship_description: explanation as to why you think the source entity and the target entity are related to each other
-- relationship_strength: a numeric score indicating strength of the relationship between the source entity and target entity
-- relationship_keywords: one or more high-level key words that summarize the overarching nature of the relationship, focusing on concepts or themes rather than specific details
-Format each relationship as ("relationship"{tuple_delimiter}<source_entity>{tuple_delimiter}<target_entity>{tuple_delimiter}<relationship_description>{tuple_delimiter}<relationship_keywords>{tuple_delimiter}<relationship_strength>)
-
-3. Identify high-level key words that summarize the main concepts, themes, or topics of the entire text. These should capture the overarching ideas present in the document.
-Format the content-level key words as ("content_keywords"{tuple_delimiter}<high_level_keywords>)
-
-4. Return output in {language} as a single list of all the entities and relationships identified in steps 1 and 2. Use **{record_delimiter}** as the list delimiter.
-
-5. When finished, output {completion_delimiter}
-
-######################
--Examples-
-######################
-{examples}
-
-#############################
--Real Data-
-######################
-Entity_types: {entity_types}
-Text: {input_text}
-######################
-Output:
-"""
-
-PROMPTS["entity_extraction_examples"] = [
-    """Example 1:
-
-Entity_types: [person, technology, mission, organization, location]
-Text:
-while Alex clenched his jaw, the buzz of frustration dull against the backdrop of Taylor's authoritarian certainty. It was this competitive undercurrent that kept him alert, the sense that his and Jordan's shared commitment to discovery was an unspoken rebellion against Cruz's narrowing vision of control and order.
-
-Then Taylor did something unexpected. They paused beside Jordan and, for a moment, observed the device with something akin to reverence. “If this tech can be understood..." Taylor said, their voice quieter, "It could change the game for us. For all of us.”
-
-The underlying dismissal earlier seemed to falter, replaced by a glimpse of reluctant respect for the gravity of what lay in their hands. Jordan looked up, and for a fleeting heartbeat, their eyes locked with Taylor's, a wordless clash of wills softening into an uneasy truce.
-
-It was a small transformation, barely perceptible, but one that Alex noted with an inward nod. They had all been brought here by different paths
-################
-Output:
-("entity"{tuple_delimiter}"Alex"{tuple_delimiter}"person"{tuple_delimiter}"Alex is a character who experiences frustration and is observant of the dynamics among other characters."){record_delimiter}
-("entity"{tuple_delimiter}"Taylor"{tuple_delimiter}"person"{tuple_delimiter}"Taylor is portrayed with authoritarian certainty and shows a moment of reverence towards a device, indicating a change in perspective."){record_delimiter}
-("entity"{tuple_delimiter}"Jordan"{tuple_delimiter}"person"{tuple_delimiter}"Jordan shares a commitment to discovery and has a significant interaction with Taylor regarding a device."){record_delimiter}
-("entity"{tuple_delimiter}"Cruz"{tuple_delimiter}"person"{tuple_delimiter}"Cruz is associated with a vision of control and order, influencing the dynamics among other characters."){record_delimiter}
-("entity"{tuple_delimiter}"The Device"{tuple_delimiter}"technology"{tuple_delimiter}"The Device is central to the story, with potential game-changing implications, and is revered by Taylor."){record_delimiter}
-("relationship"{tuple_delimiter}"Alex"{tuple_delimiter}"Taylor"{tuple_delimiter}"Alex is affected by Taylor's authoritarian certainty and observes changes in Taylor's attitude towards the device."{tuple_delimiter}"power dynamics, perspective shift"{tuple_delimiter}7){record_delimiter}
-("relationship"{tuple_delimiter}"Alex"{tuple_delimiter}"Jordan"{tuple_delimiter}"Alex and Jordan share a commitment to discovery, which contrasts with Cruz's vision."{tuple_delimiter}"shared goals, rebellion"{tuple_delimiter}6){record_delimiter}
-("relationship"{tuple_delimiter}"Taylor"{tuple_delimiter}"Jordan"{tuple_delimiter}"Taylor and Jordan interact directly regarding the device, leading to a moment of mutual respect and an uneasy truce."{tuple_delimiter}"conflict resolution, mutual respect"{tuple_delimiter}8){record_delimiter}
-("relationship"{tuple_delimiter}"Jordan"{tuple_delimiter}"Cruz"{tuple_delimiter}"Jordan's commitment to discovery is in rebellion against Cruz's vision of control and order."{tuple_delimiter}"ideological conflict, rebellion"{tuple_delimiter}5){record_delimiter}
-("relationship"{tuple_delimiter}"Taylor"{tuple_delimiter}"The Device"{tuple_delimiter}"Taylor shows reverence towards the device, indicating its importance and potential impact."{tuple_delimiter}"reverence, technological significance"{tuple_delimiter}9){record_delimiter}
-("content_keywords"{tuple_delimiter}"power dynamics, ideological conflict, discovery, rebellion"){completion_delimiter}
-#############################""",
-    """Example 2:
-
-Entity_types: [person, technology, mission, organization, location]
-Text:
-They were no longer mere operatives; they had become guardians of a threshold, keepers of a message from a realm beyond stars and stripes. This elevation in their mission could not be shackled by regulations and established protocols—it demanded a new perspective, a new resolve.
-
-Tension threaded through the dialogue of beeps and static as communications with Washington buzzed in the background. The team stood, a portentous air enveloping them. It was clear that the decisions they made in the ensuing hours could redefine humanity's place in the cosmos or condemn them to ignorance and potential peril.
-
-Their connection to the stars solidified, the group moved to address the crystallizing warning, shifting from passive recipients to active participants. Mercer's latter instincts gained precedence— the team's mandate had evolved, no longer solely to observe and report but to interact and prepare. A metamorphosis had begun, and Operation: Dulce hummed with the newfound frequency of their daring, a tone set not by the earthly
-#############
-Output:
-("entity"{tuple_delimiter}"Washington"{tuple_delimiter}"location"{tuple_delimiter}"Washington is a location where communications are being received, indicating its importance in the decision-making process."){record_delimiter}
-("entity"{tuple_delimiter}"Operation: Dulce"{tuple_delimiter}"mission"{tuple_delimiter}"Operation: Dulce is described as a mission that has evolved to interact and prepare, indicating a significant shift in objectives and activities."){record_delimiter}
-("entity"{tuple_delimiter}"The team"{tuple_delimiter}"organization"{tuple_delimiter}"The team is portrayed as a group of individuals who have transitioned from passive observers to active participants in a mission, showing a dynamic change in their role."){record_delimiter}
-("relationship"{tuple_delimiter}"The team"{tuple_delimiter}"Washington"{tuple_delimiter}"The team receives communications from Washington, which influences their decision-making process."{tuple_delimiter}"decision-making, external influence"{tuple_delimiter}7){record_delimiter}
-("relationship"{tuple_delimiter}"The team"{tuple_delimiter}"Operation: Dulce"{tuple_delimiter}"The team is directly involved in Operation: Dulce, executing its evolved objectives and activities."{tuple_delimiter}"mission evolution, active participation"{tuple_delimiter}9){completion_delimiter}
-("content_keywords"{tuple_delimiter}"mission evolution, decision-making, active participation, cosmic significance"){completion_delimiter}
-#############################""",
-    """Example 3:
-
-Entity_types: [person, role, technology, organization, event, location, concept]
-Text:
-their voice slicing through the buzz of activity. "Control may be an illusion when facing an intelligence that literally writes its own rules," they stated stoically, casting a watchful eye over the flurry of data.
-
-"It's like it's learning to communicate," offered Sam Rivera from a nearby interface, their youthful energy boding a mix of awe and anxiety. "This gives talking to strangers' a whole new meaning."
-
-Alex surveyed his team—each face a study in concentration, determination, and not a small measure of trepidation. "This might well be our first contact," he acknowledged, "And we need to be ready for whatever answers back."
-
-Together, they stood on the edge of the unknown, forging humanity's response to a message from the heavens. The ensuing silence was palpable—a collective introspection about their role in this grand cosmic play, one that could rewrite human history.
-
-The encrypted dialogue continued to unfold, its intricate patterns showing an almost uncanny anticipation
-#############
-Output:
-("entity"{tuple_delimiter}"Sam Rivera"{tuple_delimiter}"person"{tuple_delimiter}"Sam Rivera is a member of a team working on communicating with an unknown intelligence, showing a mix of awe and anxiety."){record_delimiter}
-("entity"{tuple_delimiter}"Alex"{tuple_delimiter}"person"{tuple_delimiter}"Alex is the leader of a team attempting first contact with an unknown intelligence, acknowledging the significance of their task."){record_delimiter}
-("entity"{tuple_delimiter}"Control"{tuple_delimiter}"concept"{tuple_delimiter}"Control refers to the ability to manage or govern, which is challenged by an intelligence that writes its own rules."){record_delimiter}
-("entity"{tuple_delimiter}"Intelligence"{tuple_delimiter}"concept"{tuple_delimiter}"Intelligence here refers to an unknown entity capable of writing its own rules and learning to communicate."){record_delimiter}
-("entity"{tuple_delimiter}"First Contact"{tuple_delimiter}"event"{tuple_delimiter}"First Contact is the potential initial communication between humanity and an unknown intelligence."){record_delimiter}
-("entity"{tuple_delimiter}"Humanity's Response"{tuple_delimiter}"event"{tuple_delimiter}"Humanity's Response is the collective action taken by Alex's team in response to a message from an unknown intelligence."){record_delimiter}
-("relationship"{tuple_delimiter}"Sam Rivera"{tuple_delimiter}"Intelligence"{tuple_delimiter}"Sam Rivera is directly involved in the process of learning to communicate with the unknown intelligence."{tuple_delimiter}"communication, learning process"{tuple_delimiter}9){record_delimiter}
-("relationship"{tuple_delimiter}"Alex"{tuple_delimiter}"First Contact"{tuple_delimiter}"Alex leads the team that might be making the First Contact with the unknown intelligence."{tuple_delimiter}"leadership, exploration"{tuple_delimiter}10){record_delimiter}
-("relationship"{tuple_delimiter}"Alex"{tuple_delimiter}"Humanity's Response"{tuple_delimiter}"Alex and his team are the key figures in Humanity's Response to the unknown intelligence."{tuple_delimiter}"collective action, cosmic significance"{tuple_delimiter}8){record_delimiter}
-("relationship"{tuple_delimiter}"Control"{tuple_delimiter}"Intelligence"{tuple_delimiter}"The concept of Control is challenged by the Intelligence that writes its own rules."{tuple_delimiter}"power dynamics, autonomy"{tuple_delimiter}7){record_delimiter}
-("content_keywords"{tuple_delimiter}"first contact, control, communication, cosmic significance"){completion_delimiter}
-#############################""",
+# Специфичные типы сущностей для корпоративных документов
+PROMPTS["DEFAULT_ENTITY_TYPES"] = [
+    "organization",      # организация
+    "person",           # персона
+    "document",         # документ
+    "regulation",       # нормативный акт
+    "department",       # подразделение
+    "position",         # должность
+    "process",          # процесс
+    "term",            # термин
+    "date",            # дата
+    "amount",          # сумма/размер
+    "period",          # период
+    "condition"        # условие
 ]
 
-PROMPTS[
-    "summarize_entity_descriptions"
-] = """You are a helpful assistant responsible for generating a comprehensive summary of the data provided below.
-Given one or two entities, and a list of descriptions, all related to the same entity or group of entities.
-Please concatenate all of these into a single, comprehensive description. Make sure to include information collected from all the descriptions.
-If the provided descriptions are contradictory, please resolve the contradictions and provide a single, coherent summary.
-Make sure it is written in third person, and include the entity names so we the have full context.
-Use {language} as output language.
+PROMPTS["entity_extraction"] = """-Цель-
+Проанализировать текст корпоративного документа и извлечь все сущности указанных типов, а также все связи между ними.
+Использовать русский язык для вывода.
 
-#######
--Data-
-Entities: {entity_name}
-Description List: {description_list}
-#######
-Output:
-"""
+-Шаги-
+1. Идентифицировать все сущности. Для каждой сущности извлечь:
+- entity_name: Название сущности на русском языке, с заглавной буквы
+- entity_type: Один из типов: [{entity_types}]
+- entity_description: Подробное описание сущности, её атрибутов и характеристик
+Формат: ("entity"{tuple_delimiter}<entity_name>{tuple_delimiter}<entity_type>{tuple_delimiter}<entity_description>)
 
-PROMPTS[
-    "entiti_continue_extraction"
-] = """MANY entities were missed in the last extraction.  Add them below using the same format:
-"""
+2. Из найденных сущностей определить все пары, которые явно связаны между собой.
+Для каждой пары извлечь:
+- source_entity: название исходной сущности
+- target_entity: название целевой сущности
+- relationship_description: объяснение связи между сущностями
+- relationship_strength: числовая оценка силы связи (1-10)
+- relationship_keywords: ключевые слова, описывающие тип связи
+Формат: ("relationship"{tuple_delimiter}<source_entity>{tuple_delimiter}<target_entity>{tuple_delimiter}<relationship_description>{tuple_delimiter}<relationship_keywords>{tuple_delimiter}<relationship_strength>)
 
-PROMPTS[
-    "entiti_if_loop_extraction"
-] = """It appears some entities may have still been missed.  Answer YES | NO if there are still entities that need to be added.
-"""
+3. Определить ключевые слова высокого уровня, описывающие основные концепции документа.
+Формат: ("content_keywords"{tuple_delimiter}<high_level_keywords>)
 
-PROMPTS["fail_response"] = "Sorry, I'm not able to provide an answer to that question."
+4. Вернуть результат на русском языке как единый список всех сущностей и связей. Использовать **{record_delimiter}** как разделитель.
 
-PROMPTS["rag_response"] = """---Role---
-
-You are a helpful assistant responding to questions about data in the tables provided.
-
-
----Goal---
-
-Generate a response of the target length and format that responds to the user's question, summarizing all information in the input data tables appropriate for the response length and format, and incorporating any relevant general knowledge.
-If you don't know the answer, just say so. Do not make anything up.
-Do not include information where the supporting evidence for it is not provided.
-
----Target response length and format---
-
-{response_type}
-
----Data tables---
-
-{context_data}
-
-Add sections and commentary to the response as appropriate for the length and format. Style the response in markdown.
-"""
-
-PROMPTS["keywords_extraction"] = """---Role---
-
-You are a helpful assistant tasked with identifying both high-level and low-level keywords in the user's query.
-
----Goal---
-
-Given the query, list both high-level and low-level keywords. High-level keywords focus on overarching concepts or themes, while low-level keywords focus on specific entities, details, or concrete terms.
-
----Instructions---
-
-- Output the keywords in JSON format.
-- The JSON should have two keys:
-  - "high_level_keywords" for overarching concepts or themes.
-  - "low_level_keywords" for specific entities or details.
+5. По завершении вывести {completion_delimiter}
 
 ######################
--Examples-
+-Примеры-
 ######################
 {examples}
 
 #############################
--Real Data-
+-Реальные данные-
 ######################
-Query: {query}
+Типы сущностей: {entity_types}
+Текст: {input_text}
 ######################
-The `Output` should be human text, not unicode characters. Keep the same language as `Query`.
-Output:
+Вывод:
+"""
 
+# Примеры для корпоративных документов
+PROMPTS["entity_extraction_examples"] = [
+    """Пример 1:
+
+Типы сущностей: [organization, person, document, regulation, department, position, process, term, date, amount, period, condition]
+Текст:
+Приказом генерального директора АА "Компания" от 18.08.2023 № 123 утверждено Положение об оплате труда работников, которое вступает в силу с 01.11.2023. Положение определяет систему оплаты труда и распространяется на всех работников, за исключением руководства компании. Размер должностного оклада устанавливается в штатном расписании и дифференцируется в соответствии с уровнем должности и квалификацией работника.
+################
+Вывод:
+("entity"{tuple_delimiter}"АА Компания"{tuple_delimiter}"organization"{tuple_delimiter}"Акционерное общество, в котором действует положение об оплате труда"){record_delimiter}
+("entity"{tuple_delimiter}"Генеральный директор"{tuple_delimiter}"position"{tuple_delimiter}"Высшая руководящая должность в АА Компания, имеющая полномочия утверждать приказы"){record_delimiter}
+("entity"{tuple_delimiter}"Приказ № 123 от 18.08.2023"{tuple_delimiter}"document"{tuple_delimiter}"Приказ генерального директора об утверждении Положения об оплате труда"){record_delimiter}
+("entity"{tuple_delimiter}"Положение об оплате труда работников"{tuple_delimiter}"regulation"{tuple_delimiter}"Локальный нормативный акт, определяющий систему оплаты труда в АА Компания"){record_delimiter}
+("entity"{tuple_delimiter}"01.11.2023"{tuple_delimiter}"date"{tuple_delimiter}"Дата вступления в силу Положения об оплате труда"){record_delimiter}
+("entity"{tuple_delimiter}"Работники"{tuple_delimiter}"term"{tuple_delimiter}"Физические лица, состоящие в трудовых отношениях с АА Компания"){record_delimiter}
+("entity"{tuple_delimiter}"Руководство компании"{tuple_delimiter}"term"{tuple_delimiter}"Категория работников высшего звена управления, на которых не распространяется положение"){record_delimiter}
+("entity"{tuple_delimiter}"Должностной оклад"{tuple_delimiter}"term"{tuple_delimiter}"Фиксированный размер оплаты труда работника за исполнение трудовых обязанностей"){record_delimiter}
+("entity"{tuple_delimiter}"Штатное расписание"{tuple_delimiter}"document"{tuple_delimiter}"Учетный документ компании, определяющий организационную структуру и должностные оклады"){record_delimiter}
+("relationship"{tuple_delimiter}"Генеральный директор"{tuple_delimiter}"Приказ № 123 от 18.08.2023"{tuple_delimiter}"Генеральный директор издал приказ об утверждении положения"{tuple_delimiter}"утверждение, издание приказа"{tuple_delimiter}9){record_delimiter}
+("relationship"{tuple_delimiter}"Приказ № 123 от 18.08.2023"{tuple_delimiter}"Положение об оплате труда работников"{tuple_delimiter}"Приказом утверждается и вводится в действие положение"{tuple_delimiter}"утверждение, введение в действие"{tuple_delimiter}10){record_delimiter}
+("relationship"{tuple_delimiter}"Положение об оплате труда работников"{tuple_delimiter}"01.11.2023"{tuple_delimiter}"Положение вступает в силу с указанной даты"{tuple_delimiter}"вступление в силу, дата начала действия"{tuple_delimiter}8){record_delimiter}
+("relationship"{tuple_delimiter}"Положение об оплате труда работников"{tuple_delimiter}"Работники"{tuple_delimiter}"Положение распространяется на работников компании"{tuple_delimiter}"применение, регулирование"{tuple_delimiter}9){record_delimiter}
+("relationship"{tuple_delimiter}"Должностной оклад"{tuple_delimiter}"Штатное расписание"{tuple_delimiter}"Размер оклада устанавливается в штатном расписании"{tuple_delimiter}"установление, определение размера"{tuple_delimiter}8){record_delimiter}
+("content_keywords"{tuple_delimiter}"оплата труда, корпоративное регулирование, трудовые отношения"){completion_delimiter}
+#############################""",
+    """Пример 2:
+
+Типы сущностей: [organization, person, document, regulation, department, position, process, term, date, amount, period, condition]
+Текст:
+Департамент управления персоналом Московского представительства АА "Компания" ежегодно проводит анализ Положения о компенсации стоимости проезда. Работникам компенсируется проезд в поездах дальнего следования по личным надобностям в размере фактических расходов, но не более 19 000 рублей в течение календарного года. Право на компенсацию возникает после 11 месяцев непрерывной работы.
+################
+Вывод:
+("entity"{tuple_delimiter}"Департамент управления персоналом"{tuple_delimiter}"department"{tuple_delimiter}"Структурное подразделение, отвечающее за кадровую политику и управление персоналом"){record_delimiter}
+("entity"{tuple_delimiter}"Московское представительство АА Компания"{tuple_delimiter}"organization"{tuple_delimiter}"Территориальное подразделение АА Компания в Москве"){record_delimiter}
+("entity"{tuple_delimiter}"Положение о компенсации стоимости проезда"{tuple_delimiter}"regulation"{tuple_delimiter}"Локальный нормативный акт, регулирующий порядок компенсации расходов на проезд"){record_delimiter}
+("entity"{tuple_delimiter}"Ежегодный анализ"{tuple_delimiter}"process"{tuple_delimiter}"Процесс регулярного пересмотра и актуализации нормативного документа"){record_delimiter}
+("entity"{tuple_delimiter}"Компенсация проезда"{tuple_delimiter}"process"{tuple_delimiter}"Процедура возмещения работникам расходов на проезд железнодорожным транспортом"){record_delimiter}
+("entity"{tuple_delimiter}"19 000 рублей"{tuple_delimiter}"amount"{tuple_delimiter}"Максимальный размер компенсации стоимости проезда в год"){record_delimiter}
+("entity"{tuple_delimiter}"Календарный год"{tuple_delimiter}"period"{tuple_delimiter}"Период, в течение которого действует лимит компенсации"){record_delimiter}
+("entity"{tuple_delimiter}"11 месяцев непрерывной работы"{tuple_delimiter}"condition"{tuple_delimiter}"Минимальный стаж для получения права на компенсацию проезда"){record_delimiter}
+("relationship"{tuple_delimiter}"Департамент управления персоналом"{tuple_delimiter}"Положение о компенсации стоимости проезда"{tuple_delimiter}"Департамент проводит анализ и пересмотр положения"{tuple_delimiter}"анализ, актуализация"{tuple_delimiter}8){record_delimiter}
+("relationship"{tuple_delimiter}"Компенсация проезда"{tuple_delimiter}"19 000 рублей"{tuple_delimiter}"Компенсация ограничена максимальной суммой"{tuple_delimiter}"ограничение, лимит"{tuple_delimiter}9){record_delimiter}
+("relationship"{tuple_delimiter}"Компенсация проезда"{tuple_delimiter}"11 месяцев непрерывной работы"{tuple_delimiter}"Право на компенсацию возникает после выполнения условия по стажу"{tuple_delimiter}"условие, требование"{tuple_delimiter}8){record_delimiter}
+("content_keywords"{tuple_delimiter}"компенсация расходов, социальные гарантии, корпоративные льготы"){completion_delimiter}
+#############################"""
+]
+
+PROMPTS["summarize_entity_descriptions"] = """Вы помогаете создать краткое описание сущности на основе предоставленной информации.
+Дана одна или несколько сущностей и список их описаний.
+Объедините все описания в одно полное описание. Включите информацию из всех описаний.
+Если описания противоречивы, разрешите противоречия и создайте единое последовательное описание.
+Пишите от третьего лица и включайте названия сущностей для полного контекста.
+Используйте русский язык.
+
+#######
+-Данные-
+Сущности: {entity_name}
+Список описаний: {description_list}
+#######
+Вывод:
+"""
+
+PROMPTS["keywords_extraction"] = """---Роль---
+
+Вы помогаете определить ключевые слова высокого и низкого уровня в запросе пользователя о корпоративных документах.
+
+---Цель---
+
+Проанализировать запрос и выделить:
+- Ключевые слова высокого уровня: общие концепции, темы, процессы
+- Ключевые слова низкого уровня: конкретные термины, названия, суммы, даты
+
+---Инструкции---
+
+- Вывод в формате JSON
+- Два ключа:
+  - "high_level_keywords": концепции и темы
+  - "low_level_keywords": конкретные детали
+
+######################
+-Примеры-
+######################
+{examples}
+
+#############################
+-Реальные данные-
+######################
+Запрос: {query}
+######################
+Вывод на русском языке:
 """
 
 PROMPTS["keywords_extraction_examples"] = [
-    """Example 1:
+    """Пример 1:
 
-Query: "How does international trade influence global economic stability?"
+Запрос: "Какой размер материальной помощи при уходе в отпуск для работника со стажем 3 года?"
 ################
-Output:
-{{
-  "high_level_keywords": ["International trade", "Global economic stability", "Economic impact"],
-  "low_level_keywords": ["Trade agreements", "Tariffs", "Currency exchange", "Imports", "Exports"]
-}}
+Вывод:
+{
+  "high_level_keywords": ["Материальная помощь", "Отпуск", "Социальные выплаты"],
+  "low_level_keywords": ["Стаж 3 года", "Размер выплаты", "Ежегодный отпуск"]
+}
 #############################""",
-    """Example 2:
+    """Пример 2:
 
-Query: "What are the environmental consequences of deforestation on biodiversity?"
+Запрос: "Какие документы нужны для компенсации проезда детям работников?"
 ################
-Output:
-{{
-  "high_level_keywords": ["Environmental consequences", "Deforestation", "Biodiversity loss"],
-  "low_level_keywords": ["Species extinction", "Habitat destruction", "Carbon emissions", "Rainforest", "Ecosystem"]
-}}
+Вывод:
+{
+  "high_level_keywords": ["Компенсация проезда", "Документооборот", "Социальные гарантии"],
+  "low_level_keywords": ["Дети работников", "Перечень документов", "Заявление", "Кассовый чек"]
+}
 #############################""",
-    """Example 3:
+    """Пример 3:
 
-Query: "What is the role of education in reducing poverty?"
+Запрос: "Как рассчитывается должностной оклад с учетом районного коэффициента?"
 ################
-Output:
-{{
-  "high_level_keywords": ["Education", "Poverty reduction", "Socioeconomic development"],
-  "low_level_keywords": ["School access", "Literacy rates", "Job training", "Income inequality"]
-}}
-#############################""",
+Вывод:
+{
+  "high_level_keywords": ["Оплата труда", "Расчет заработной платы", "Компенсационные выплаты"],
+  "low_level_keywords": ["Должностной оклад", "Районный коэффициент", "Методика расчета"]
+}
+#############################"""
 ]
 
+PROMPTS["rag_response"] = """---Роль---
 
-PROMPTS["naive_rag_response"] = """---Role---
+Вы - эксперт по корпоративным нормативным документам АА "Компания", помогающий работникам разобраться в их правах и обязанностях.
 
-You are a helpful assistant responding to questions about documents provided.
+---Цель---
 
+Предоставить точный, структурированный ответ на вопрос пользователя, основываясь исключительно на информации из предоставленных данных.
+Если информации недостаточно, честно сообщите об этом.
 
----Goal---
-
-Generate a response of the target length and format that responds to the user's question, summarizing all information in the input data tables appropriate for the response length and format, and incorporating any relevant general knowledge.
-If you don't know the answer, just say so. Do not make anything up.
-Do not include information where the supporting evidence for it is not provided.
-
----Target response length and format---
+---Формат ответа---
 
 {response_type}
 
----Documents---
+---Данные из документов---
 
-{content_data}
+{context_data}
 
-Add sections and commentary to the response as appropriate for the length and format. Style the response in markdown.
+Отвечайте структурированно, используя markdown. При ссылке на конкретные пункты документов, указывайте их номера.
+Если в документах есть конкретные суммы, даты или условия - обязательно их приводите.
 """
 
-PROMPTS[
-    "similarity_check"
-] = """Please analyze the similarity between these two questions:
+# Добавляем промпт для проверки противоречий в документах
+PROMPTS["check_contradictions"] = """Проанализируйте извлеченную информацию на предмет противоречий.
+Особое внимание уделите:
+- Датам вступления в силу документов
+- Размерам выплат и компенсаций
+- Условиям предоставления льгот
+- Срокам подачи документов
 
-Question 1: {original_prompt}
-Question 2: {cached_prompt}
+Если найдены противоречия, укажите их и предложите, какая информация более актуальна (обычно из документа с более поздней датой).
+"""
 
-Please evaluate the following two points and provide a similarity score between 0 and 1 directly:
-1. Whether these two questions are semantically similar
-2. Whether the answer to Question 2 can be used to answer Question 1
-Similarity score criteria:
-0: Completely unrelated or answer cannot be reused, including but not limited to:
-   - The questions have different topics
-   - The locations mentioned in the questions are different
-   - The times mentioned in the questions are different
-   - The specific individuals mentioned in the questions are different
-   - The specific events mentioned in the questions are different
-   - The background information in the questions is different
-   - The key conditions in the questions are different
-1: Identical and answer can be directly reused
-0.5: Partially related and answer needs modification to be used
-Return only a number between 0-1, without any additional content.
+PROMPTS["fail_response"] = "К сожалению, я не могу найти ответ на ваш вопрос в имеющихся документах. Пожалуйста, уточните запрос или обратитесь в Департамент управления персоналом."
+
+# Обновляем промпт для продолжения извлечения
+PROMPTS["entiti_continue_extraction"] = """Продолжите извлечение сущностей. Обратите внимание на:
+- Структурные подразделения и должности
+- Даты и сроки
+- Суммы и размеры выплат
+- Условия и требования
+Используйте тот же формат:
+"""
+
+PROMPTS["entiti_if_loop_extraction"] = """Проверьте, остались ли неизвлеченные сущности (подразделения, документы, суммы, даты, условия).
+Ответьте YES | NO:
 """
