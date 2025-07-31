@@ -9,7 +9,7 @@ from typing import List, Dict, Callable, Any, Union, Optional
 import aioboto3
 import aiohttp
 import numpy as np
-import ollama
+# import ollama
 import torch
 import time
 from openai import (

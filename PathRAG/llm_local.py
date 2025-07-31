@@ -77,6 +77,7 @@ async def qwen_local_complete(
                     try:
                         # Пытаемся найти JSON в ответе
                         import re
+                        print("Hello world")
                         json_match = re.search(r'\{.*\}', content, re.DOTALL)
                         if json_match:
                             json_str = json_match.group(0)
@@ -96,7 +97,7 @@ async def qwen_local_complete(
 
 
 # Функция для работы с локальной embedding моделью
-@wrap_embedding_func_with_attrs(embedding_dim=768, max_token_size=8192)
+@wrap_embedding_func_with_attrs(embedding_dim=4096, max_token_size=8192)
 @retry(
     stop=stop_after_attempt(3),
     wait=wait_exponential(multiplier=1, min=4, max=10),

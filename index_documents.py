@@ -5,6 +5,7 @@ from PathRAG.llm_local import qwen_local_complete, qwen_local_embedding
 import asyncio
 
 
+
 async def index_documents():
     """Индексация документов из папки input"""
 
@@ -17,14 +18,14 @@ async def index_documents():
         embedding_func=qwen_local_embedding,
 
         # Используем Qdrant для векторного хранилища
-        vector_storage="QdrantVectorDBStorage",
+        # vector_storage="QdrantVectorDBStorage",
 
         # Настройки Qdrant
-        qdrant_config={
-            "host": "localhost",
-            "port": 6333,
-            "grpc_port": 6334,
-        },
+        # qdrant_config={
+        #     "host": "localhost",
+        #     "port": 6333,
+        #     "grpc_port": 6334,
+        # },
 
         # Параметры чанков
         chunk_token_size=1200,

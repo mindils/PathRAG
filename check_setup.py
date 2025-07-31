@@ -88,7 +88,7 @@ def check_dependencies():
     print("\nChecking dependencies...")
 
     required_packages = [
-        "pathrag",
+        "PathRag",
         "qdrant-client",
         "aiohttp",
         "numpy",

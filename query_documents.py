@@ -21,14 +21,14 @@ async def query_documents():
         embedding_func=qwen_local_embedding,
 
         # Используем Qdrant
-        vector_storage="QdrantVectorDBStorage",
+        # vector_storage="QdrantVectorDBStorage",
 
         # Настройки Qdrant
-        qdrant_config={
-            "host": "localhost",
-            "port": 6333,
-            "grpc_port": 6334,
-        },
+        # qdrant_config={
+        #     "host": "localhost",
+        #     "port": 6333,
+        #     "grpc_port": 6334,
+        # },
 
         # Те же параметры что и при индексации
         chunk_token_size=1200,
